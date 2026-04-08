@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalcHub — Free Finance Calculators & Tools</title>
+<meta name="description" content="Free online finance calculators: mortgage, car loan, compound interest, paycheck, and tip calculator. Fast, accurate, no signup required.">
+<meta name="keywords" content="mortgage calculator, car loan calculator, compound interest calculator, paycheck calculator, tip calculator, finance tools">
+<!-- PWA Meta Tags -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CalcHub">
+<meta name="theme-color" content="#2563eb">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #dbeafe;
+    --accent: #10b981;
+    --accent-dark: #059669;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-light: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --orange: #f97316;
+    --orange-light: #fff7ed;
+    --orange-border: #fed7aa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Remove number input spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem 1.5rem;
+  }
+  header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+  header h1 span { color: #a5f3fc; }
+  header p { opacity: 0.85; font-size: 1.05rem; margin-top: 0.25rem; }
+
+  /* AD BANNER */
+  .ad-slot {
+    background: #f1f5f9;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    text-align: center;
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 728px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+  }
+  .ad-slot::before { content: "Ad Space — "; font-weight: 600; }
+
+  /* NAVIGATION TABS */
+  .tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .tab-btn {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    background: var(--card);
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .tab-icon { font-size: 1.1rem; }
+
+  /* MAIN LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .container { grid-template-columns: 1fr 300px; }
+  }
+
+  /* CALCULATOR CARD */
+  .calc-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.25rem;
+    display: none;
+  }
+  .calc-card.active { display: block; }
+  .calc-card h2 { font-size: 1.4rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+  .calc-card .subtitle { color: var(--text-light); font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+  /* SECTION DIVIDER */
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4rem;
+    margin: 1.25rem 0 1rem;
+  }
+
+  /* EXTRA PAYMENT ZONE */
+  .extra-zone {
+    background: var(--orange-light);
+    border: 2px solid var(--orange-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem 1.25rem;
+    margin-top: 1.25rem;
+  }
+  .extra-zone .extra-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--orange);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  /* FORM ELEMENTS */
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; color: var(--text); }
+  .input-wrap { position: relative; }
+  .input-wrap .prefix,
+  .input-wrap .suffix {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
+  .input-wrap .prefix { left: 14px; }
+  .input-wrap .suffix { right: 14px; }
+
+  input[type="number"], select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    background: #fff;
+    color: var(--text);
+  }
+  input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  .has-prefix input { padding-left: 2rem; }
+  .has-suffix input { padding-right: 2.5rem; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* CALCULATE BUTTON */
+  .calc-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 0.5rem;
+  }
+  .calc-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+  .calc-btn:active { transform: translateY(0); }
+
+  /* SIDE-BY-SIDE RESULTS WRAPPER */
+  .results-wrapper {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    align-items: start;
+    width: 100%;
+  }
+  .results-wrapper.show { display: grid; animation: fadeIn 0.3s ease; }
+  @media (max-width: 640px) {
+    .results-wrapper.show { grid-template-columns: 1fr; }
+  }
+
+  /* RESULTS — standard green */
+  .results {
+    padding: 0.85rem 0.9rem;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    border: 2px solid #bbf7d0;
+    border-radius: var(--radius);
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .results h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-dark); margin-bottom: 0.6rem; white-space: nowrap; }
+  .result-row { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid #d1fae5; align-items: center; gap: 0.5rem; flex-wrap: nowrap; }
+  .result-row:last-child { border: none; }
+  .result-label { color: var(--text-light); font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
+  .result-value { font-weight: 700; font-size: 0.82rem; color: var(--text); text-align: right; white-space: nowrap; }
+  .result-value.big { font-size: 1.1rem; color: var(--accent-dark); white-space: nowrap; }
+
+  /* RESULTS — orange extra payment */
+  .results-extra {
+    padding: 0.85rem 0.9rem;
+    background: var(--orange-light);
+    border: 2px solid var(--orange-border);
+    border-radius: var(--radius);
+    height: 100%;
+    display: none;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .results-extra.show { display: block; }
+  .results-extra h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--orange); margin-bottom: 0.6rem; white-space: nowrap; }
+  .results-extra .result-row { border-bottom: 1px solid var(--orange-border); flex-wrap: nowrap; }
+  .results-extra .result-row:last-child { border: none; }
+  .results-extra .result-value.big { color: var(--orange); font-size: 1.1rem; white-space: nowrap; }
+  .savings-badge {
+    display: inline-block;
+    background: var(--orange);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  /* AFFILIATE BOX */
+  .affiliate-box {
+    margin-top: 1.25rem;
+    padding: 1.1rem 1.25rem;
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .affiliate-box .aff-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-light);
+    margin-bottom: 0.6rem;
+  }
+  .affiliate-box .aff-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  .aff-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .aff-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .aff-link:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.1);
+    color: var(--primary);
+  }
+  .aff-link .aff-name { display: flex; align-items: center; gap: 0.4rem; }
+  .aff-link .aff-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 0.15rem 0.5rem;
+    border-radius: 50px;
+  }
+  .aff-link .aff-arrow { color: var(--text-light); font-size: 0.85rem; }
+  .aff-disclaimer {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 0.6rem;
+    line-height: 1.4;
+  }
+
+  /* SIDEBAR */
+  .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+  .sidebar .ad-slot { min-height: 250px; display: flex; align-items: center; justify-content: center; margin: 0; }
+  .info-box { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem; }
+  .info-box h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .info-box p { font-size: 0.88rem; color: var(--text-light); line-height: 1.5; }
+
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+  footer a { color: var(--primary); text-decoration: none; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.5rem; }
+    .calc-card { padding: 1.25rem; }
+    .row { grid-template-columns: 1fr; }
+    .tab-btn { font-size: 0.8rem; padding: 0.5rem 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Calc<span>Hub</span></h1>
+  <p>Free finance calculators — fast, accurate, no signup</p>
+</header>
+
+<div class="ad-slot">Replace with your AdSense code (Leaderboard 728x90)</div>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showCalc('mortgage', this)">
+    <span class="tab-icon">🏠</span> Mortgage
+  </button>
+  <button class="tab-btn" onclick="showCalc('carloan', this)">
+    <span class="tab-icon">🚗</span> Car Loan
+  </button>
+  <button class="tab-btn" onclick="showCalc('compound', this)">
+    <span class="tab-icon">📈</span> Compound Interest
+  </button>
+  <button class="tab-btn" onclick="showCalc('paycheck', this)">
+    <span class="tab-icon">💰</span> Paycheck
+  </button>
+  <button class="tab-btn" onclick="showCalc('tip', this)">
+    <span class="tab-icon">🧾</span> Tip
+  </button>
+</nav>
+
+<div class="container">
+  <main>
+
+    <!-- ==================== MORTGAGE CALCULATOR ==================== -->
+    <div class="calc-card active" id="calc-mortgage">
+      <h2>🏠 Mortgage Calculator</h2>
+      <p class="subtitle">Estimate your monthly home loan payment — and see how extra payments save you money</p>
+
+      <div class="section-label">Loan Details</div>
+
+      <div class="form-group">
+        <label>Home Price</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="m-price" value="350000" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Down Payment</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="m-down" value="70000" min="0">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Interest Rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="m-rate" value="6.5" step="0.1" min="0">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Loan Term</label>
+          <select id="m-term">
+            <option value="30" selected>30 years</option>
+            <option value="20">20 years</option>
+            <option value="15">15 years</option>
+            <option value="10">10 years</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- EXTRA PAYMENT ZONE -->
+      <div class="extra-zone">
+        <div class="extra-label">⚡ Extra Payment Savings (Optional)</div>
+        <div class="row">
+          <div class="form-group" style="margin-bottom:0">
+            <label>Extra Payment Amount</label>
+            <div class="input-wrap has-prefix">
+              <span class="prefix">$</span>
+              <input type="number" id="m-extra" value="0" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label>Payment Frequency</label>
+            <select id="m-extra-freq">
+              <option value="monthly" selected>Monthly</option>
+              <option value="weekly">Weekly</option>
+              <option value="yearly">Yearly (once/yr)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcMortgage()">Calculate Payment</button>
+
+      <!-- Side-by-side results wrapper -->
+      <div class="results-wrapper" id="m-results-wrapper">
+
+        <!-- Base results (left) -->
+        <div class="results" id="m-results">
+          <h3>📊 Base Results</h3>
+          <div class="result-row">
+            <span class="result-label">Monthly Payment</span>
+            <span class="result-value big" id="m-monthly"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Loan Amount</span>
+            <span class="result-value" id="m-loan"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Total Interest</span>
+            <span class="result-value" id="m-interest"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Total Cost</span>
+            <span class="result-value" id="m-total"></span>
+          </div>
+        </div>
+
+        <!-- Extra payment results (right) -->
+        <div class="results-extra" id="m-extra-results">
+          <h3>⚡ With Extra Payments</h3>
+          <div class="result-row">
+            <span class="result-label">New Payoff Time</span>
+            <span class="result-value big" id="m-new-term"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Time Saved</span>
+            <span class="result-value" id="m-time-saved" style="color:var(--orange);font-weight:800;"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">New Total Interest</span>
+            <span class="result-value" id="m-new-interest"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">New Total Cost</span>
+            <span class="result-value" id="m-new-total"></span>
+          </div>
+        </div>
+
+      </div><!-- end results-wrapper -->
+
+      <!-- MORTGAGE AFFILIATE CTA (below both panels) -->
+      <div class="affiliate-box" id="m-affiliate" style="display:none;margin-top:1rem;">
+        <div class="aff-label">Sponsored — Compare Rates</div>
+        <div class="aff-title">Ready to buy? Compare mortgage rates from top lenders in minutes.</div>
+        <div class="aff-links">
+          <a class="aff-link" href="https://www.lendingtree.com/home/mortgage/" target="_blank" rel="noopener sponsored">
+            <span class="aff-name">🏦 LendingTree <span class="aff-badge">Top Pick</span></span>
+            <span class="aff-arrow">Compare Rates →</span>
+          </a>
+          <a class="aff-link" href="https://www.rocketmortgage.com/" target="_blank" rel="noopener sponsored">
+            <span class="aff-name">🚀 Rocket Mortgage</span>
+            <span class="aff-arrow">Get Pre-Approved →</span>
+          </a>
+          <a class="aff-link" href="https://better.com/" target="_blank" rel="noopener sponsored">
+            <span class="aff-name">✅ Better.com — No Fees</span>
+            <span class="aff-arrow">See My Rate →</span>
+          </a>
+        </div>
+        <p class="aff-disclaimer">Advertiser disclosure: CalcHub may earn a commission when you use partner links above. This doesn't affect our calculator results.</p>
+      </div>
+
+    </div>
+
+    <!-- ==================== CAR LOAN CALCULATOR ==================== -->
+    <div class="calc-card" id="calc-carloan">
+      <h2>🚗 Car Loan Calculator</h2>
+      <p class="subtitle">Figure out your monthly auto payment — and see how extra payments pay it off faster</p>
+
+      <div class="section-label">Loan Details</div>
+
+      <div class="form-group">
+        <label>Vehicle Price</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="cl-price" value="35000" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Down Payment / Trade-in Value</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="cl-down" value="5000" min="0">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Interest Rate (APR)</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="cl-rate" value="7.0" step="0.1" min="0">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Loan Term</label>
+          <select id="cl-term">
+            <option value="72" selected>72 months (6 yr)</option>
+            <option value="60">60 months (5 yr)</option>
+            <option value="48">48 months (4 yr)</option>
+            <option value="36">36 months (3 yr)</option>
+            <option value="24">24 months (2 yr)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sales Tax Rate</label>
+        <div class="input-wrap has-suffix">
+          <input type="number" id="cl-tax" value="6.0" step="0.1" min="0">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+
+      <!-- EXTRA PAYMENT ZONE -->
+      <div class="extra-zone">
+        <div class="extra-label">⚡ Extra Payment Savings (Optional)</div>
+        <div class="row">
+          <div class="form-group" style="margin-bottom:0">
+            <label>Extra Payment Amount</label>
+            <div class="input-wrap has-prefix">
+              <span class="prefix">$</span>
+              <input type="number" id="cl-extra" value="0" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label>Payment Frequency</label>
+            <select id="cl-extra-freq">
+              <option value="monthly" selected>Monthly</option>
+              <option value="weekly">Weekly</option>
+              <option value="yearly">Yearly (once/yr)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcCarLoan()">Calculate Payment</button>
+
+      <!-- Side-by-side results wrapper -->
+      <div class="results-wrapper" id="cl-results-wrapper">
+
+        <!-- Base results (left) -->
+        <div class="results" id="cl-results">
+          <h3>📊 Base Results</h3>
+          <div class="result-row">
+            <span class="result-label">Monthly Payment</span>
+            <span class="result-value big" id="cl-monthly"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Financed Amount</span>
+            <span class="result-value" id="cl-financed"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Sales Tax</span>
+            <span class="result-value" id="cl-salestax"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Total Interest</span>
+            <span class="result-value" id="cl-interest"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Total Cost</span>
+            <span class="result-value" id="cl-total"></span>
+          </div>
+        </div>
+
+        <!-- Extra payment results (right) -->
+        <div class="results-extra" id="cl-extra-results">
+          <h3>⚡ With Extra Payments</h3>
+          <div class="result-row">
+            <span class="result-label">New Payoff Time</span>
+            <span class="result-value big" id="cl-new-term"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Time Saved</span>
+            <span class="result-value" id="cl-time-saved" style="color:var(--orange);font-weight:800;"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Interest Saved</span>
+            <span class="result-value" id="cl-int-saved" style="color:var(--orange);font-weight:800;"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">New Total Interest</span>
+            <span class="result-value" id="cl-new-interest"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">New Total Cost</span>
+            <span class="result-value" id="cl-new-total"></span>
+          </div>
+        </div>
+
+      </div><!-- end results-wrapper -->
+
+      <!-- CAR LOAN AFFILIATE CTA (below both panels) -->
+      <div class="affiliate-box" id="cl-affiliate" style="display:none;margin-top:1rem;">
+        <div class="aff-label">Sponsored — Compare Auto Loan Rates</div>
+        <div class="aff-title">Get a better rate on your car loan — check offers without affecting your credit score.</div>
+        <div class="aff-links">
+          <a class="aff-link" href="https://www.lendingtree.com/auto/" target="_blank" rel="noopener sponsored">
+            <span class="aff-name">🏦 LendingTree Auto <span class="aff-badge">Top Pick</span></span>
+            <span class="aff-arrow">Compare Rates →</span>
+          </a>
+          <a class="aff-link" href="https://www.myautoloan.com/" target="_blank" rel="noopener sponsored">
+            <span class="aff-name">🚗 MyAutoLoan</span>
+            <span class="aff-arrow">Get My Rate →</span>
+          </a>
+          <a class="aff-link" href="https://www.autopay.com/" target="_blank" rel="noopener sponsored">
+            <span class="aff-name">💳 AutoPay — Refinance & Save</span>
+            <span class="aff-arrow">Check My Rate →</span>
+          </a>
+        </div>
+        <p class="aff-disclaimer">Advertiser disclosure: CalcHub may earn a commission when you use partner links above. This doesn't affect our calculator results.</p>
+      </div>
+
+    </div>
+
+    <!-- ==================== COMPOUND INTEREST CALCULATOR ==================== -->
+    <div class="calc-card" id="calc-compound">
+      <h2>📈 Compound Interest Calculator</h2>
+      <p class="subtitle">See how your money grows over time</p>
+      <div class="form-group">
+        <label>Initial Investment</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="ci-principal" value="10000" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Monthly Contribution</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="ci-contrib" value="500" min="0">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Annual Interest Rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="ci-rate" value="8" step="0.1" min="0">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Time Period</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="ci-years" value="20" min="1">
+            <span class="suffix">yrs</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Compound Frequency</label>
+        <select id="ci-freq">
+          <option value="12" selected>Monthly</option>
+          <option value="4">Quarterly</option>
+          <option value="1">Annually</option>
+          <option value="365">Daily</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="calcCompound()">Calculate Growth</button>
+      <div class="results" id="ci-results">
+        <h3>Your Results</h3>
+        <div class="result-row">
+          <span class="result-label">Future Value</span>
+          <span class="result-value big" id="ci-future"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Total Contributions</span>
+          <span class="result-value" id="ci-contribs"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Total Interest Earned</span>
+          <span class="result-value" id="ci-earned"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Initial Investment</span>
+          <span class="result-value" id="ci-init"></span>
+        </div>
+        <!-- COMPOUND INTEREST AFFILIATE CTA -->
+        <div class="affiliate-box">
+          <div class="aff-label">Sponsored — Start Investing</div>
+          <div class="aff-title">Put your money to work. Start investing today with these top platforms.</div>
+          <div class="aff-links">
+            <a class="aff-link" href="https://www.acorns.com/" target="_blank" rel="noopener sponsored">
+              <span class="aff-name">🌱 Acorns — Invest spare change <span class="aff-badge">Top Pick</span></span>
+              <span class="aff-arrow">Start Free →</span>
+            </a>
+            <a class="aff-link" href="https://www.sofi.com/invest/" target="_blank" rel="noopener sponsored">
+              <span class="aff-name">💰 SoFi Invest</span>
+              <span class="aff-arrow">Open Account →</span>
+            </a>
+            <a class="aff-link" href="https://robinhood.com/" target="_blank" rel="noopener sponsored">
+              <span class="aff-name">🟢 Robinhood — Commission-Free</span>
+              <span class="aff-arrow">Get Started →</span>
+            </a>
+          </div>
+          <p class="aff-disclaimer">Advertiser disclosure: CalcHub may earn a commission when you use partner links above. This doesn't affect our calculator results.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PAYCHECK CALCULATOR ==================== -->
+    <div class="calc-card" id="calc-paycheck">
+      <h2>💰 Paycheck Calculator</h2>
+      <p class="subtitle">Estimate your take-home pay after taxes</p>
+      <div class="form-group">
+        <label>Annual Salary (Gross)</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="pc-salary" value="65000" min="0">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Pay Frequency</label>
+          <select id="pc-freq">
+            <option value="26" selected>Bi-weekly (26/yr)</option>
+            <option value="24">Semi-monthly (24/yr)</option>
+            <option value="52">Weekly (52/yr)</option>
+            <option value="12">Monthly (12/yr)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filing Status</label>
+          <select id="pc-filing">
+            <option value="single" selected>Single</option>
+            <option value="married">Married</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>State Tax Rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="pc-state" value="5" step="0.1" min="0">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>401(k) Contribution</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="pc-401k" value="6" step="0.5" min="0" max="100">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcPaycheck()">Calculate Take-Home</button>
+      <div class="results" id="pc-results">
+        <h3>Your Results (per paycheck)</h3>
+        <div class="result-row">
+          <span class="result-label">Take-Home Pay</span>
+          <span class="result-value big" id="pc-net"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Gross Pay</span>
+          <span class="result-value" id="pc-gross"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Federal Tax</span>
+          <span class="result-value" id="pc-fed"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">State Tax</span>
+          <span class="result-value" id="pc-statetax"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Social Security + Medicare</span>
+          <span class="result-value" id="pc-fica"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">401(k) Deduction</span>
+          <span class="result-value" id="pc-401kamt"></span>
+        </div>
+        <!-- PAYCHECK AFFILIATE CTA -->
+        <div class="affiliate-box">
+          <div class="aff-label">Sponsored — Payroll & Benefits</div>
+          <div class="aff-title">Run payroll in minutes. Top-rated tools for small business owners.</div>
+          <div class="aff-links">
+            <a class="aff-link" href="https://gusto.com/" target="_blank" rel="noopener sponsored">
+              <span class="aff-name">🟠 Gusto Payroll <span class="aff-badge">Top Pick</span></span>
+              <span class="aff-arrow">Try Free →</span>
+            </a>
+            <a class="aff-link" href="https://quickbooks.intuit.com/payroll/" target="_blank" rel="noopener sponsored">
+              <span class="aff-name">🟦 QuickBooks Payroll</span>
+              <span class="aff-arrow">See Plans →</span>
+            </a>
+          </div>
+          <p class="aff-disclaimer">Advertiser disclosure: CalcHub may earn a commission when you use partner links above. This doesn't affect our calculator results.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TIP CALCULATOR ==================== -->
+    <div class="calc-card" id="calc-tip">
+      <h2>🧾 Tip Calculator</h2>
+      <p class="subtitle">Split the bill and calculate tips easily</p>
+      <div class="form-group">
+        <label>Bill Amount</label>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="t-bill" value="85" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Tip Percentage</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="t-tip" value="20" min="0" step="1">
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Split Between</label>
+          <div class="input-wrap">
+            <input type="number" id="t-split" value="1" min="1">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <button onclick="setTip(15)" style="flex:1;min-width:60px;padding:0.5rem;border:2px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;">15%</button>
+        <button onclick="setTip(18)" style="flex:1;min-width:60px;padding:0.5rem;border:2px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;">18%</button>
+        <button onclick="setTip(20)" style="flex:1;min-width:60px;padding:0.5rem;border:2px solid var(--primary);border-radius:8px;background:var(--primary-light);cursor:pointer;font-weight:600;font-size:0.9rem;color:var(--primary);">20%</button>
+        <button onclick="setTip(25)" style="flex:1;min-width:60px;padding:0.5rem;border:2px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;">25%</button>
+      </div>
+      <button class="calc-btn" onclick="calcTip()">Calculate Tip</button>
+      <div class="results" id="t-results">
+        <h3>Your Results</h3>
+        <div class="result-row">
+          <span class="result-label">Total Per Person</span>
+          <span class="result-value big" id="t-perperson"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Tip Amount</span>
+          <span class="result-value" id="t-tipamt"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Total Bill + Tip</span>
+          <span class="result-value" id="t-total"></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Tip Per Person</span>
+          <span class="result-value" id="t-tipperperson"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-slot">Replace with your AdSense code (In-article 468x60)</div>
+  </main>
+
+  <aside class="sidebar">
+    <div class="ad-slot">Replace with AdSense (Sidebar 300x250)</div>
+    <div class="info-box" id="sidebar-info">
+      <h3>💡 Quick Tip</h3>
+      <p>A good rule of thumb: your monthly mortgage payment should be no more than 28% of your gross monthly income.</p>
+    </div>
+    <div class="ad-slot">Replace with AdSense (Sidebar 300x600)</div>
+  </aside>
+</div>
+
+<div class="ad-slot">Replace with your AdSense code (Bottom Leaderboard 728x90)</div>
+
+<footer>
+  <p>&copy; 2026 CalcHub. Free financial calculators for everyone.</p>
+  <p style="margin-top:0.25rem;">
+    <a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Contact</a>
+  </p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;">Disclaimer: These calculators provide estimates only and should not be considered financial advice.</p>
+</footer>
+
+<script>
+// ============ UTILITY ============
+const $ = id => document.getElementById(id);
+const val = id => parseFloat($(id).value) || 0;
+const fmt = n => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+function fmtMonths(totalMonths) {
+  const yrs = Math.floor(totalMonths / 12);
+  const mos = Math.round(totalMonths % 12);
+  if (yrs === 0) return `${mos} month${mos !== 1 ? 's' : ''}`;
+  if (mos === 0) return `${yrs} year${yrs !== 1 ? 's' : ''}`;
+  return `${yrs} yr${yrs !== 1 ? 's' : ''} ${mos} mo${mos !== 1 ? 's' : ''}`;
+}
+
+function showCalc(name, btn) {
+  document.querySelectorAll('.calc-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  $('calc-' + name).classList.add('active');
+  btn.classList.add('active');
+  updateSidebarTip(name);
+}
+
+const tips = {
+  mortgage: "<h3>💡 Quick Tip</h3><p>Adding just $200/month extra to a 30-year mortgage at 6.5% can cut <strong>5+ years</strong> off your loan and save tens of thousands in interest.</p>",
+  carloan: "<h3>💡 Quick Tip</h3><p>Financial experts recommend keeping total car costs (payment + insurance + gas) under 15-20% of your take-home pay.</p>",
+  compound: "<h3>💡 Quick Tip</h3><p>The \"Rule of 72\" — divide 72 by your interest rate to estimate how many years it takes to double your money. At 8%, that's about 9 years.</p>",
+  paycheck: "<h3>💡 Quick Tip</h3><p>Contributing enough to your 401(k) to get your employer's full match is essentially free money. Most employers match 3-6% of your salary.</p>",
+  tip: "<h3>💡 Quick Tip</h3><p>Standard tipping in the U.S.: 15-20% for sit-down restaurants, 10-15% for takeout, $1-2 per drink at a bar.</p>"
+};
+
+function updateSidebarTip(name) {
+  $('sidebar-info').innerHTML = tips[name] || tips.mortgage;
+}
+
+// ============ EXTRA PAYMENT ENGINE (shared) ============
+// Runs an amortization simulation with extra monthly-equivalent payments
+// extraMonthly = the extra amount applied to principal each month
+// Returns { months, totalInterest, totalPaid }
+function amortizeWithExtra(principal, monthlyRate, basePayment, extraMonthly) {
+  let balance = principal;
+  let totalInterest = 0;
+  let months = 0;
+  const MAX_MONTHS = 1200; // safety cap
+
+  while (balance > 0.005 && months < MAX_MONTHS) {
+    const interestCharge = balance * monthlyRate;
+    const payment = Math.min(balance + interestCharge, basePayment + extraMonthly);
+    const principalPaid = payment - interestCharge;
+    balance -= principalPaid;
+    totalInterest += interestCharge;
+    months++;
+  }
+  return { months, totalInterest, totalPaid: totalInterest + principal };
+}
+
+// Convert extra payment input → monthly-equivalent extra principal
+function toMonthlyExtra(amount, freq) {
+  if (freq === 'weekly')  return amount * 52 / 12;  // ~4.333 weeks/month
+  if (freq === 'yearly')  return amount / 12;
+  return amount; // monthly
+}
+
+// ============ MORTGAGE ============
+function calcMortgage() {
+  const price  = val('m-price');
+  const down   = val('m-down');
+  const P      = price - down;
+  const r      = val('m-rate') / 100 / 12;
+  const n      = parseInt($('m-term').value) * 12;
+  const extraAmt  = val('m-extra');
+  const extraFreq = $('m-extra-freq').value;
+
+  if (P <= 0) { alert('Loan amount must be positive.'); return; }
+
+  // Base monthly payment
+  const monthly = r === 0 ? P / n : P * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n) - 1);
+  const totalBase   = monthly * n;
+  const interestBase = totalBase - P;
+
+  $('m-monthly').textContent   = fmt(monthly);
+  $('m-interest').textContent  = fmt(interestBase);
+  $('m-total').textContent     = fmt(totalBase);
+  $('m-loan').textContent      = fmt(P);
+  $('m-results-wrapper').classList.add('show');
+  $('m-affiliate').style.display = 'block';
+
+  // Extra payment comparison
+  if (extraAmt > 0) {
+    const extraMonthly = toMonthlyExtra(extraAmt, extraFreq);
+    const { months: newMonths, totalInterest: newInterest, totalPaid: newTotal } =
+      amortizeWithExtra(P, r, monthly, extraMonthly);
+
+    const monthsSaved   = n - newMonths;
+    const interestSaved = interestBase - newInterest;
+
+    $('m-new-term').textContent     = fmtMonths(newMonths);
+    $('m-time-saved').innerHTML     = `🕐 ${fmtMonths(monthsSaved)} sooner · 💵 ${fmt(interestSaved)} saved`;
+    $('m-new-interest').textContent = fmt(newInterest);
+    $('m-new-total').textContent    = fmt(newTotal);
+    $('m-extra-results').classList.add('show');
+  } else {
+    $('m-extra-results').classList.remove('show');
+  }
+}
+
+// ============ CAR LOAN ============
+function calcCarLoan() {
+  const price  = val('cl-price');
+  const down   = val('cl-down');
+  const taxRate = val('cl-tax') / 100;
+  const salesTax = price * taxRate;
+  const P      = price + salesTax - down;
+  const r      = val('cl-rate') / 100 / 12;
+  const n      = parseInt($('cl-term').value);
+  const extraAmt  = val('cl-extra');
+  const extraFreq = $('cl-extra-freq').value;
+
+  if (P <= 0) { alert('Financed amount must be positive.'); return; }
+
+  const monthly = r === 0 ? P / n : P * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n) - 1);
+  const totalBase    = monthly * n;
+  const interestBase = totalBase - P;
+
+  $('cl-monthly').textContent   = fmt(monthly);
+  $('cl-interest').textContent  = fmt(interestBase);
+  $('cl-salestax').textContent  = fmt(salesTax);
+  $('cl-total').textContent     = fmt(totalBase + down);
+  $('cl-financed').textContent  = fmt(P);
+  $('cl-results-wrapper').classList.add('show');
+  $('cl-affiliate').style.display = 'block';
+
+  // Extra payment comparison
+  if (extraAmt > 0) {
+    const extraMonthly = toMonthlyExtra(extraAmt, extraFreq);
+    const { months: newMonths, totalInterest: newInterest, totalPaid: newTotal } =
+      amortizeWithExtra(P, r, monthly, extraMonthly);
+
+    const monthsSaved   = n - newMonths;
+    const interestSaved = interestBase - newInterest;
+
+    $('cl-new-term').textContent     = fmtMonths(newMonths);
+    $('cl-time-saved').innerHTML     = `🕐 ${fmtMonths(monthsSaved)} sooner`;
+    $('cl-int-saved').innerHTML      = `💵 ${fmt(interestSaved)} saved`;
+    $('cl-new-interest').textContent = fmt(newInterest);
+    $('cl-new-total').textContent    = fmt(newTotal + down);
+    $('cl-extra-results').classList.add('show');
+  } else {
+    $('cl-extra-results').classList.remove('show');
+  }
+}
+
+// ============ COMPOUND INTEREST ============
+function calcCompound() {
+  const P = val('ci-principal');
+  const monthly = val('ci-contrib');
+  const r = val('ci-rate') / 100;
+  const t = val('ci-years');
+  const n = parseInt($('ci-freq').value);
+
+  const fvPrincipal = P * Math.pow(1 + r/n, n*t);
+  const ratePerPeriod = r / 12;
+  const totalPeriods = 12 * t;
+  let fvContrib = 0;
+  if (ratePerPeriod > 0) {
+    fvContrib = monthly * ((Math.pow(1+ratePerPeriod, totalPeriods) - 1) / ratePerPeriod);
+  } else {
+    fvContrib = monthly * totalPeriods;
+  }
+
+  const futureValue = fvPrincipal + fvContrib;
+  const totalContribs = monthly * 12 * t;
+  const interestEarned = futureValue - P - totalContribs;
+
+  $('ci-future').textContent  = fmt(futureValue);
+  $('ci-contribs').textContent = fmt(totalContribs);
+  $('ci-earned').textContent  = fmt(interestEarned);
+  $('ci-init').textContent    = fmt(P);
+  $('ci-results').classList.add('show');
+}
+
+// ============ PAYCHECK ============
+function calcPaycheck() {
+  const salary   = val('pc-salary');
+  const periods  = parseInt($('pc-freq').value);
+  const stateRate = val('pc-state') / 100;
+  const k401      = val('pc-401k') / 100;
+  const filing    = $('pc-filing').value;
+
+  const grossPerPay = salary / periods;
+  const k401amt     = grossPerPay * k401;
+  const taxableAnnual = salary * (1 - k401);
+
+  let fedTaxAnnual = 0;
+  const singleBrackets  = [[11600,0.10],[35550,0.12],[53375,0.22],[91425,0.24],[51775,0.32],[365625,0.35],[Infinity,0.37]];
+  const marriedBrackets = [[23200,0.10],[71100,0.12],[106750,0.22],[182850,0.24],[103550,0.32],[243750,0.35],[Infinity,0.37]];
+  const brackets = filing === 'married' ? marriedBrackets : singleBrackets;
+  let remaining = taxableAnnual;
+  for (const [size, rate] of brackets) {
+    if (remaining <= 0) break;
+    const taxable = Math.min(remaining, size);
+    fedTaxAnnual += taxable * rate;
+    remaining -= taxable;
+  }
+
+  const fedPerPay   = fedTaxAnnual / periods;
+  const statePerPay = grossPerPay * stateRate;
+  const ficaPerPay  = grossPerPay * (0.062 + 0.0145);
+  const netPay      = grossPerPay - fedPerPay - statePerPay - ficaPerPay - k401amt;
+
+  $('pc-net').textContent     = fmt(netPay);
+  $('pc-gross').textContent   = fmt(grossPerPay);
+  $('pc-fed').textContent     = '−' + fmt(fedPerPay);
+  $('pc-statetax').textContent = '−' + fmt(statePerPay);
+  $('pc-fica').textContent    = '−' + fmt(ficaPerPay);
+  $('pc-401kamt').textContent = '−' + fmt(k401amt);
+  $('pc-results').classList.add('show');
+}
+
+// ============ TIP ============
+function setTip(pct) {
+  $('t-tip').value = pct;
+  calcTip();
+}
+
+function calcTip() {
+  const bill    = val('t-bill');
+  const tipPct  = val('t-tip') / 100;
+  const split   = Math.max(1, val('t-split'));
+  const tipAmt  = bill * tipPct;
+  const total   = bill + tipAmt;
+
+  $('t-perperson').textContent   = fmt(total / split);
+  $('t-tipamt').textContent      = fmt(tipAmt);
+  $('t-total').textContent       = fmt(total);
+  $('t-tipperperson').textContent = fmt(tipAmt / split);
+  $('t-results').classList.add('show');
+}
+
+// Auto-run mortgage on load
+calcMortgage();
+
+// ============ PWA SERVICE WORKER ============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW failed:', err));
+  });
+}
+</script>
+</body>
+</html>
